@@ -1,2 +1,2 @@
 # LLaDA
-Official PyTorch implementation for "Large Language Diffusion Models"
+We will release the LLaDA 8B Base model and the inference code in about a week. 
