@@ -44,6 +44,23 @@ We provide guidelines for the pre-training and SFT of LLaDA in [GUIDELINES.md](G
 You can also refer to [SMDM](https://github.com/ML-GSAI/SMDM), which has a similar training process to LLaDA 
 and has open-sourced the training framework.
 
+## Evaluation
+
+We provide the code for evaluating LLaDA-8B-Base using the [lm evaluation harness](https://github.com/EleutherAI/lm-evaluation-harness) library. Please refer to the `./evaluation` directory.
+
+To run the evaluation:
+
+First, you need to install the lm evaluation harness library according to the [official tutorial](https://github.com/EleutherAI/lm-evaluation-harness?tab=readme-ov-file#install), and copy `eval_llada.py` and `eval.sh` into your lm evaluation harness folder:
+
+```angular2html
+cp ./evaluation/eval_llada.py ./evaluation/eval.sh <path_to_lm_evaluation_harness>
+```
+
+Then, replace the `<path_to_llada_base_model>` in `eval.sh` with your LLaDA model path and run:
+
+```angular2html
+bash <path_to_lm_evaluation_harness>/eval.sh
+```
 
 ## FAQ
 Here, we address some common questions about LLaDA.
