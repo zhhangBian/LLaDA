@@ -48,7 +48,9 @@ and has open-sourced the training framework.
 
 We use two evaluation methods: conditional likelihood estimation and conditional generation. For the base model, conditional likelihood estimation is applied to specific metrics and conditional generation to the rest. For the Instruct model, conditional generation is used for all metrics.
 
-We implement conditional likelihood estimation using the [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) library, while conditional generation is performed with an internal library, as lm-evaluation-harness lacks support for certain metrics (i..e, HumanEval-FIM). For details, see Appendix B.5 of our paper.
+We implement conditional likelihood estimation using the [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) library, while conditional generation is performed with an internal library, as lm-evaluation-harness lacks support for certain metrics (i..e, HumanEval-FIM). 
+
+Please refer to Appendix B.5. of our [paper](https://arxiv.org/abs/2502.09992) for all evaluation details.
 
 We provide the code for evaluation using the open-source library lm-evaluation-harness. To begin, please install `lm_eval==0.4.5` and refer to `evaluation/eval.sh` for the specific commands.
 
