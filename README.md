@@ -46,19 +46,12 @@ and has open-sourced the training framework.
 
 ## Evaluation
 
-We provide the code for evaluating LLaDA-8B-Base using the [lm evaluation harness](https://github.com/EleutherAI/lm-evaluation-harness) library. Please refer to the `./evaluation` directory.
+We use two evaluation methods: conditional likelihood estimation and conditional generation. For the base model, conditional likelihood estimation is applied to specific metrics and conditional generation to the rest. For the Instruct model, conditional generation is used for all metrics.
 
-To run the evaluation, you need to install the lm evaluation harness library
+We implement conditional likelihood estimation using the [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) library, while conditional generation is performed with an internal library, as lm-evaluation-harness lacks support for certain metrics (i..e, HumanEval-FIM). For details, see Appendix B.5 of our paper.
 
-```angular2html
-pip install lm_eval==0.4.5
-```
+We provide the code for evaluation using the open-source library lm-evaluation-harness. To begin, please install `lm_eval==0.4.5` and refer to `evaluation/eval.sh` for the specific commands.
 
-Then, replace the `<path_to_llada_base_model>` in `eval.sh` with your LLaDA model path and run:
-
-```angular2html
-bash ./evaluation/eval.sh
-```
 
 ## FAQ
 Here, we address some common questions about LLaDA.
