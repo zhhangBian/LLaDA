@@ -44,7 +44,7 @@ def generate(model, prompt, steps=128, gen_length=128, block_length=128, tempera
     '''
     Args:
         model: Mask predictor.
-        prompt: A tensor of shape (1, l).
+        prompt: A tensor of shape (1, L).
         steps: Sampling steps, less than or equal to gen_length.
         gen_length: Generated answer length.
         block_length: Block length, less than or equal to gen_length. If less than gen_length, it means using semi_autoregressive remasking.
