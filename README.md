@@ -51,7 +51,7 @@ We provide the code for evaluating LLaDA-8B-Base using the [lm evaluation harnes
 To run the evaluation, you need to install the lm evaluation harness library
 
 ```angular2html
-pip install lm_eval
+pip install lm_eval==0.4.5
 ```
 
 Then, replace the `<path_to_llada_base_model>` in `eval.sh` with your LLaDA model path and run:
