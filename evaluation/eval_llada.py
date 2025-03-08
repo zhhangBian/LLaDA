@@ -36,10 +36,27 @@ class LLaDAEvalHarness(LM):
         max_length=4096,
         batch_size=32,
         mc_num=128,
-        is_check_greedy=True, # Whether to check if target sequence is generated via greedy decoding
+        is_check_greedy=True,
         cfg=0.,
         device="cuda",
     ):
+        ```
+        Args:
+            model_path: LLaDA-8B-Base model path.
+            mask_id: The token id of [MASK] is 126336.
+            max_length: the max sequence length.
+            batch_size: mini batch size.
+            mc_num: Monte Carlo estimation iterations
+            is_check_greedy: For certain metrics like LAMBADA, the evaluation requires the model to verify whether the answer 
+                             is generated through greedy sampling conditioned on the prompt (note that this differs from conditional
+                             generation). We implement this verification through the suffix_greedy_prediction() function, which 
+                             returns a True/False judgment used for accuracy calculation. 
+                             When is_check_greedy is set to True, the lm-evaluation-harness library automatically invokes this function. 
+                             However, since none of the metrics in the LLaDA paper (https://arxiv.org/abs/2502.09992) require this functionality, 
+                             we recommend setting is_check_greedy to False. This configuration causes suffix_greedy_prediction() to return False 
+                             by default, significantly accelerating the evaluation process.
+            cfg_scale: Unsupervised classifier-free guidance scale.
+        ```
         super().__init__()
 
         accelerator = accelerate.Accelerator()
