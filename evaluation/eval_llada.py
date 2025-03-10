@@ -40,7 +40,7 @@ class LLaDAEvalHarness(LM):
         cfg=0.,
         device="cuda",
     ):
-        ```
+        '''
         Args:
             model_path: LLaDA-8B-Base model path.
             mask_id: The token id of [MASK] is 126336.
@@ -56,7 +56,7 @@ class LLaDAEvalHarness(LM):
                              we recommend setting is_check_greedy to False. This configuration causes suffix_greedy_prediction() to return False 
                              by default, significantly accelerating the evaluation process.
             cfg_scale: Unsupervised classifier-free guidance scale.
-        ```
+        '''
         super().__init__()
 
         accelerator = accelerate.Accelerator()
