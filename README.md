@@ -33,6 +33,8 @@ You can directly run `python chat.py` to have multi-round conversations with LLa
 In addition, please refer to our paper and [GUIDELINES.md](GUIDELINES.md) for more details about the inference methods.
 
 ## Gradio demo 
+Thank you very much to [apolinário](https://github.com/apolinario) for helping us create this amazing demo!
+
 First, install [Gradio](https://www.gradio.app) `pip install gradio`, and then you can directly run `python app.py`
 
 <div style="display: flex; justify-content: center; flex-wrap: wrap;">
