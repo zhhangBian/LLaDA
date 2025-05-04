@@ -16,6 +16,7 @@ from lm_eval.api.registry import register_model
 from tqdm import tqdm
 
 from transformers import AutoTokenizer, AutoModel
+from generate import generate
 
 
 def set_seed(seed):
@@ -38,7 +39,12 @@ class LLaDAEvalHarness(LM):
         mc_num=128,
         is_check_greedy=True,
         cfg=0.,
+        steps=1024,
+        gen_length=1024,
+        block_length=1024,
+        remasking='low_confidence',
         device="cuda",
+        **kwargs,
     ):
         '''
         Args:
@@ -92,10 +98,10 @@ class LLaDAEvalHarness(LM):
         self.is_check_greedy = is_check_greedy
 
         self.cfg = cfg
-        print(f'model: {model_path}')
-        print(f'Is check greedy: {is_check_greedy}')
-        print(f'cfg: {cfg}')
-    
+        self.steps = steps
+        self.gen_length = gen_length
+        self.block_length = block_length
+        self.remasking = remasking    
     @property
     def rank(self):
         return self._rank
@@ -231,19 +237,46 @@ class LLaDAEvalHarness(LM):
                 is_target_greedy_dec = self.suffix_greedy_prediction(prefix, target)
 
                 out.append((ll, 1.0 if is_target_greedy_dec else 0.0))
-                print('=' * 20)
-                print('prefix: ', elem['prefix_text'])
-                print('target: ', elem['target_text'])
-                print(ll, is_target_greedy_dec)
-                print('=' * 20, end='\n\n')
         torch.cuda.empty_cache()
         return out
 
     def loglikelihood_rolling(self, requests):
         raise NotImplementedError
 
-    def generate_until(self, context, max_length, stop, **generation_kwargs):
-        raise NotImplementedError
+    def generate_until(self, requests: list[Instance]):
+        def _tokenize(e):
+            return {
+                "question": self.tokenizer(e["question"])["input_ids"],
+                "question_text": e["question"],
+                "until": e["until"],
+            }
+
+        ds = [{"question": req.args[0], "until": req.args[1]['until']} for req in requests]
+        ds = Dataset.from_list(ds)
+        ds = ds.map(_tokenize)
+        ds = ds.with_format("torch")
+
+        out = []
+        for elem in tqdm(ds, desc="Generating..."):
+            prompt = elem["question"].unsqueeze(0).to(self.device)
+            stop_tokens = elem["until"]
+ 
+            generated_answer = generate(self.model, prompt, steps=self.steps, gen_length=self.gen_length, block_length=self.block_length, 
+                                        temperature=0, cfg_scale=self.cfg, remasking=self.remasking, mask_id=self.mask_id)
+            
+            generated_answer = self.tokenizer.decode(generated_answer[0][prompt.shape[1]:], skip_special_tokens=False)
+            for stop_seq in stop_tokens:
+                    if stop_seq in generated_answer:
+                        generated_answer = generated_answer.split(stop_seq)[0]
+
+            # remove special tokens
+            generated_answer_ids = self.tokenizer(generated_answer)["input_ids"]
+            generated_answer = self.tokenizer.decode(generated_answer_ids, skip_special_tokens=True)
+            out.append(generated_answer)
+
+            self.accelerator.wait_for_everyone()
+
+        return out
 
 
 if __name__ == "__main__":
