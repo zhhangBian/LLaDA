@@ -13,6 +13,10 @@ rivaling LLaMA3 8B in performance.
     <img src="./imgs/LLaDA_vs_LLaMA_chat.svg" style="width: 46%" />
 </div>
 
+## News
+- [2024.05] We now provide evaluation code based on the [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) for the LLaDA-Base.
+- [2024.02] We upload our paper to [arXiv](https://arxiv.org/abs/2502.09992) and open source [LLaDA-8B-Base](https://huggingface.co/GSAI-ML/LLaDA-8B-Base) and [LLaDA-8B-Instruct](https://huggingface.co/GSAI-ML/LLaDA-8B-Instruct).
+
 
 ## Inference
 The [LLaDA-8B-Base](https://huggingface.co/GSAI-ML/LLaDA-8B-Base) and [LLaDA-8B-Instruct](https://huggingface.co/GSAI-ML/LLaDA-8B-Instruct) are uploaded
@@ -57,12 +61,11 @@ and has open-sourced the training framework.
 
 We use two evaluation methods: conditional likelihood estimation and conditional generation. For the base model, conditional likelihood estimation is applied to specific metrics and conditional generation to the rest. For the Instruct model, conditional generation is used for all metrics.
 
-We implement conditional likelihood estimation using the [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) library, while conditional generation is performed with an internal library, as lm-evaluation-harness lacks support for certain metrics (i.e., HumanEval-FIM). 
+In our [paper](https://arxiv.org/abs/2502.09992), we implement conditional likelihood estimation using the [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) library, while conditional generation is performed with an internal library, as lm-evaluation-harness lacks support for certain metrics (i.e., HumanEval-FIM). Please refer to Appendix B.5. of our [paper](https://arxiv.org/abs/2502.09992) for all evaluation details.
 
-Please refer to Appendix B.5. of our [paper](https://arxiv.org/abs/2502.09992) for all evaluation details.
+**2024.05.04.** We now provide evaluation code based on the [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) for the LLaDA-Base, including conditional likelihood estimation and conditional generation. However, for the Instruct model (both LLama3-Instruct and LLaDA-Instruct), we encountered some bugs. We are still debugging the issue. 
 
-We provide the code for evaluation using the open-source library lm-evaluation-harness. To begin, please install `lm_eval==0.4.5` and refer to `evaluation/eval.sh` for the specific commands.
-
+Please refer to [EVAL.md](EVAL.md) for the usage of the evaluation code and the BUG details. Any help in resolving this bug would be sincerely appreciated.
 
 ## FAQ
 Here, we address some common questions about LLaDA.
