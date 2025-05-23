@@ -14,6 +14,7 @@ rivaling LLaMA3 8B in performance.
 </div>
 
 ## News
+- [2025.05.23] We have released the paper of [LLaDA-V](https://ml-gsai.github.io/LLaDA-V-demo/).
 - [2025.05] We have provided evaluation code based on the [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) for the LLaDA-Base.
 - [2025.02] We have uploaded our paper to [arXiv](https://arxiv.org/abs/2502.09992) and open-sourced [LLaDA-8B-Base](https://huggingface.co/GSAI-ML/LLaDA-8B-Base) and [LLaDA-8B-Instruct](https://huggingface.co/GSAI-ML/LLaDA-8B-Instruct).
 
