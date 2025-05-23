@@ -120,13 +120,14 @@ to the [Consistency model](https://arxiv.org/pdf/2410.11081), where sampling spe
 1000 times over the course of 4 years. **We believe there is significant room for optimization in LLaDA's 
 sampling efficiency as well**. Current solutions, including semi-autoregressive sampling (as 
 detailed in [GUIDELINES.md](GUIDELINES.md)), can mitigate the fixed context length issue, and 
-[consistency distillation](https://arxiv.org/pdf/2502.05415) can reduce the number of sampling steps.
+[consistency distillation](https://arxiv.org/pdf/2502.05415) can reduce the number of sampling steps. In
+addition, some [cache methods](https://github.com/maomaocun/dLLM-cache) can also be adapted by LLaDA.
 
 
 ### 4. What is the training stability of LLaDA?
 For details on the pre-training process of LLaDA, please refer to Section 2.2 of our paper. 
 During the total pre-training on 2.3T tokens, we encountered a training crash (loss becoming NaN) 
-only once at 1.2T tokens. Our solution was to resume checkpoint and reduce 
+only once at 1.2T tokens. Our solution was to resume the checkpoint and reduce 
 the learning rate from 4e-4 to 1e-4.
 
 
