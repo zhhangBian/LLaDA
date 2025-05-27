@@ -1,27 +1,10 @@
 # Large Language Diffusion Models
-<p align="center">
-  <a href="https://arxiv.org/abs/2502.09992">
-    <img src="https://img.shields.io/badge/arXiv-2502.09992-red.svg" />
-  </a>
-  <a href="https://huggingface.co/GSAI-ML/LLaDA-8B-Base">
-    <img src="https://img.shields.io/badge/Hugging%20Face%20-LLaDA_Base%20-FFEB3B" />
-  </a>
-  <a href="https://huggingface.co/GSAI-ML/LLaDA-8B-Instruct">
-    <img src="https://img.shields.io/badge/Hugging%20Face%20-LLaDA_Instruct%20-FFEB3B" />
-  </a>
-  <a href="https://huggingface.co/spaces/multimodalart/LLaDA">
-    <img src="https://img.shields.io/badge/🤗%20Hugging%20Face%20-Spaces%20demo%20-blue" />
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://zhuanlan.zhihu.com/p/24214732238">
-    <img src="https://img.shields.io/badge/Zhihu1-知乎1-blue" />
-  </a>
-  <a href="https://www.zhihu.com/question/1908479621466396378/answer/1910672718174589774?share_code=1kreOq5gzOtnM&utm_psn=1910708245535912148&utm_source=wechat_timeline&utm_medium=social&s_r=0">
-    <img src="https://img.shields.io/badge/Zhihu2-知乎2-blue" />
-  </a>
-</p>
+[![arXiv](https://img.shields.io/badge/Paper-arXiv-red.svg)](https://arxiv.org/abs/2502.09992)
+[![deploy](https://img.shields.io/badge/Hugging%20Face-LLaDA_Base-FFEB3B)](https://huggingface.co/GSAI-ML/LLaDA-8B-Base)
+[![deploy](https://img.shields.io/badge/Hugging%20Face-LLaDA_Instruct-FFEB3B)](https://huggingface.co/GSAI-ML/LLaDA-8B-Instruct)
+[![deploy](https://img.shields.io/badge/20Hugging%20Face-Demo-blue)](https://huggingface.co/spaces/multimodalart/LLaDA)
+[![deploy](https://img.shields.io/badge/Zhihu1-知乎1-blue)](https://zhuanlan.zhihu.com/p/24214732238)
+[![deploy](https://img.shields.io/badge/Zhihu2-知乎2-blue)]([https://zhuanlan.zhihu.com/p/24214732238](https://www.zhihu.com/question/1908479621466396378/answer/1910672718174589774?share_code=1kreOq5gzOtnM&utm_psn=1910708245535912148&utm_source=wechat_timeline&utm_medium=social&s_r=0))
 
 ## News
 - [2025.05.25] We introduce [LLaDA 1.5](https://ml-gsai.github.io/LLaDA-1.5-Demo/), which incorporates VRPO to reduce gradient variance and enhance preference alignment in LLaDA.
