@@ -2,7 +2,7 @@
 [![arXiv](https://img.shields.io/badge/Paper-arXiv-red.svg)](https://arxiv.org/abs/2502.09992)
 [![deploy](https://img.shields.io/badge/Hugging%20Face-LLaDA_Base-FFEB3B)](https://huggingface.co/GSAI-ML/LLaDA-8B-Base)
 [![deploy](https://img.shields.io/badge/Hugging%20Face-LLaDA_Instruct-FFEB3B)](https://huggingface.co/GSAI-ML/LLaDA-8B-Instruct)
-[![deploy](https://img.shields.io/badge/20Hugging%20Face-Demo-blue)](https://huggingface.co/spaces/multimodalart/LLaDA)
+[![deploy](https://img.shields.io/badge/Hugging%20Face-Demo-blue)](https://huggingface.co/spaces/multimodalart/LLaDA)
 [![deploy](https://img.shields.io/badge/Zhihu1-知乎1-blue)](https://zhuanlan.zhihu.com/p/24214732238)
 [![deploy](https://img.shields.io/badge/Zhihu2-知乎2-blue)]([https://zhuanlan.zhihu.com/p/24214732238](https://www.zhihu.com/question/1908479621466396378/answer/1910672718174589774?share_code=1kreOq5gzOtnM&utm_psn=1910708245535912148&utm_source=wechat_timeline&utm_medium=social&s_r=0))
 
