@@ -125,7 +125,7 @@ to the [Consistency model](https://arxiv.org/pdf/2410.11081), where sampling spe
 sampling efficiency as well**. Current solutions, including semi-autoregressive sampling (as 
 detailed in [GUIDELINES.md](GUIDELINES.md)), can mitigate the fixed context length issue, and 
 [consistency distillation](https://arxiv.org/pdf/2502.05415) can reduce the number of sampling steps. In
-addition, some cache methods (e.g., [Fast-dllm](https://github.com/maomaocun/dLLM-cache), [dllm-cache](https://github.com/maomaocun/dLLM-cache))
+addition, some cache methods (e.g., [Fast-dllm](https://github.com/NVlabs/Fast-dLLM), [dllm-cache](https://github.com/maomaocun/dLLM-cache))
 can also be adapted by LLaDA.
 
 
