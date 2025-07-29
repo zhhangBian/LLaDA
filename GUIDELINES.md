@@ -74,7 +74,7 @@ noisy_batch, _, p_mask = forward_process(input_ids)
 
 # Do not add noise to the prompt
 token_positions = torch.arange(noisy_batch.shape[1], device=noisy_batch.device).expand(noisy_batch.size(0), noisy_batch.size(1))
-prompt_mask = (temp_tensor < prompt_length.unsqueeze(1))
+prompt_mask = (token_positions < prompt_length.unsqueeze(1))
 noisy_batch[prompt_mask] = input_ids[prompt_mask]
 
 # Calculate the answer length (including the padded <EOS> tokens)
