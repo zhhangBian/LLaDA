@@ -188,6 +188,6 @@ been adopted by LLaDA.
 ## Discussion
 Feel free to scan the WeChat QR code below to participate in the discussion and stay updated with the latest progress.
 <div style="display: flex; justify-content: center; flex-wrap: wrap;">
-    <img src="./imgs/QR.jpg" style="width: 80%" />
+    <img src="./imgs/QR.jpg" style="width: 50%" />
 </div>
 
