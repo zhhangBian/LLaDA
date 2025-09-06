@@ -40,9 +40,12 @@ def get_num_transfer_tokens(mask_index, steps):
     return num_transfer_tokens
 
 
+def get_decode_result(x, tokenizer):
+    return tokenizer.batch_decode(x[:, x.shape[1]//2:], skip_special_tokens=True)[0]
+
 @ torch.no_grad()
 def generate(model, prompt, steps=128, gen_length=128, block_length=128, temperature=0.,
-             cfg_scale=0., remasking='low_confidence', mask_id=126336):
+             cfg_scale=0., remasking='low_confidence', mask_id=126336, tokenizer=None):
     '''
     Args:
         model: Mask predictor.
@@ -124,6 +127,9 @@ def generate(model, prompt, steps=128, gen_length=128, block_length=128, tempera
                 transfer_index[j, select_index] = True
             x[transfer_index] = x0[transfer_index]
 
+            print(f"num block {num_block} step {i} result:\n{get_decode_result(x, tokenizer)}")
+            print("-"*50)
+
     return x
 
 
@@ -143,7 +149,7 @@ def main():
     input_ids = tokenizer(prompt)['input_ids']
     input_ids = torch.tensor(input_ids).to(device).unsqueeze(0)
 
-    out = generate(model, input_ids, steps=128, gen_length=128, block_length=32, temperature=0., cfg_scale=0., remasking='low_confidence')
+    out = generate(model, input_ids, steps=128, gen_length=128, block_length=32, temperature=0., cfg_scale=0., remasking='low_confidence', tokenizer=tokenizer)
     print(tokenizer.batch_decode(out[:, input_ids.shape[1]:], skip_special_tokens=True)[0])
 
 
