@@ -55,20 +55,29 @@ def generate(model, prompt, steps=128, gen_length=128, block_length=128, tempera
         remasking: Remasking strategy. 'low_confidence' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
     '''
+    # 创建 shape = (1, prompt长度+gen_length) 的张量，全部初始化为 mask_id
+    # 前半部分根据输入的 prompt 填充，后半部分为待生成区域（全是 mask）
     x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(model.device)
     x[:, :prompt.shape[1]] = prompt.clone()
 
+    # bool 张量，标记哪些 token 是 prompt 内容（不是 mask）
     prompt_index = (x != mask_id)
 
+    # 生成长度必须能被 block 长度整除（便于后续分块采样）
     assert gen_length % block_length == 0
+    # 按照block为单位进行便利生成
     num_blocks = gen_length // block_length
 
     assert steps % num_blocks == 0
+    # 计算每个 block 的扩散步数（细分步数）
     steps = steps // num_blocks
 
     for num_block in range(num_blocks):
+        # 把 x 当前 block 区域里哪些位置是 mask 标记出来（mask_index）
         block_mask_index = (x[:, prompt.shape[1] + num_block * block_length: prompt.shape[1] + (num_block + 1) * block_length:] == mask_id)
+        # 计算本 block 里每一步要去除多少个 mask（保证整个 block 匀速“扩散恢复”）
         num_transfer_tokens = get_num_transfer_tokens(block_mask_index, steps)
+        # 遍历每个细分步
         for i in range(steps):
             mask_index = (x == mask_id)
             if cfg_scale > 0.:
@@ -79,23 +88,34 @@ def generate(model, prompt, steps=128, gen_length=128, block_length=128, tempera
                 logits, un_logits = torch.chunk(logits, 2, dim=0)
                 logits = un_logits + (cfg_scale + 1) * (logits - un_logits)
             else:
+                # 预测每个被 [MASK] 掩盖位置最可能是什么 token
                 logits = model(x).logits
 
+            # 用采样策略挑出置信度低或随机几个位置，正式“揭开”填上预测词
+            # 新的 [MASK] 格局输入给模型，继续推理，重复步骤，直到生成区域全部“揭开”
+
+            # 给 logits 添加 Gumbel noise（以温度参数控制采样随机性），促进更平滑的采样策略
             logits_with_noise = add_gumbel_noise(logits, temperature=temperature)
+            # 根据 logits 计算每个位置的预测 token（argmax）
             x0 = torch.argmax(logits_with_noise, dim=-1) # b, l
 
+            # 'low_confidence' 时，对应 token 按 softmax 概率作为置信度，置信度低的优先揭开
             if remasking == 'low_confidence':
                 p = F.softmax(logits, dim=-1)
                 x0_p = torch.squeeze(
                     torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1) # b, l
+            # 'random' 时，全部随机分数
             elif remasking == 'random':
                 x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
             else:
                 raise NotImplementedError(remasking)
 
+            # 本步只生成当前 block，不是当前block以外的内容置信度全部设为 -∞，不会被采样到
             x0_p[:, prompt.shape[1] + (num_block + 1) * block_length:] = -np.inf
 
+            # 只对当前还没揭开的 mask 位使用新预测/置信度，其他位保持原样或设为极低置信度
             x0 = torch.where(mask_index, x0, x)
+            # 根据 mask_index 选择 x0_p 或 -np.inf（-np.inf 表示置信度无限低）
             confidence = torch.where(mask_index, x0_p, -np.inf)
 
             transfer_index = torch.zeros_like(x0, dtype=torch.bool, device=x0.device)
@@ -109,9 +129,10 @@ def generate(model, prompt, steps=128, gen_length=128, block_length=128, tempera
 
 def main():
     device = 'cuda'
+    model_path = "/mnt/youwei-data/zhuohang/model/GSAI-ML/LLaDA-8B-Instruct"
 
-    model = AutoModel.from_pretrained('GSAI-ML/LLaDA-8B-Instruct', trust_remote_code=True, torch_dtype=torch.bfloat16).to(device).eval()
-    tokenizer = AutoTokenizer.from_pretrained('GSAI-ML/LLaDA-8B-Instruct', trust_remote_code=True)
+    model = AutoModel.from_pretrained(model_path, trust_remote_code=True, torch_dtype=torch.bfloat16).to(device).eval()
+    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
 
     prompt = "Lily can run 12 kilometers per hour for 4 hours. After that, she runs 6 kilometers per hour. How many kilometers can she run in 8 hours?"
 
