@@ -4,8 +4,8 @@ import torch.nn.functional as F
 
 from transformers import AutoTokenizer, AutoModel
 
-
-def add_gumbel_noise(logits, temperature):
+# 在采样过程中添加噪声，促进更平滑的采样策略
+def add_gumbel_noise(logits: torch.Tensor, temperature: float) -> torch.Tensor:
     '''
     The Gumbel max is a method for sampling categorical distributions.
     According to arXiv:2409.02908, for MDM, low-precision Gumbel Max improves perplexity score but reduces generation quality.
@@ -19,7 +19,9 @@ def add_gumbel_noise(logits, temperature):
     return logits.exp() / gumbel_noise
 
 
-def get_num_transfer_tokens(mask_index, steps):
+# 每步应转移的 token 数尽量均匀
+# 预先计算出“在每一步应该从当前 block 的 [MASK] 中unmask多少个 token
+def get_num_transfer_tokens(mask_index: torch.Tensor, steps: int) -> torch.Tensor:
     '''
     In the reverse process, the interval [0, 1] is uniformly discretized into steps intervals.
     Furthermore, because LLaDA employs a linear noise schedule (as defined in Eq. (8)),
@@ -27,25 +29,43 @@ def get_num_transfer_tokens(mask_index, steps):
 
     This function is designed to precompute the number of tokens that need to be transitioned at each step.
     '''
+    # 计算每个 block 里有多少个 mask
     mask_num = mask_index.sum(dim=1, keepdim=True)
 
+    # 计算每个 block 里每一步要去除多少个 mask
     base = mask_num // steps
+    # 计算每个 block 里每一步要去除多少个 mask的余数
     remainder = mask_num % steps
 
+    # 尽量平均的unmask，赋予一样的base值
     num_transfer_tokens = torch.zeros(mask_num.size(0), steps, device=mask_index.device, dtype=torch.int64) + base
 
+    # 尽可能平均分配的给予token
     for i in range(mask_num.size(0)):
+        # 计算每个 block 里每一步要去除多少个 mask的余数
         num_transfer_tokens[i, :remainder[i]] += 1
 
     return num_transfer_tokens
 
 
+# 进行decode
+# mask是special token，在此不显示
 def get_decode_result(x, tokenizer):
     return tokenizer.batch_decode(x[:, x.shape[1]//2:], skip_special_tokens=True)[0]
 
 @ torch.no_grad()
-def generate(model, prompt, steps=128, gen_length=128, block_length=128, temperature=0.,
-             cfg_scale=0., remasking='low_confidence', mask_id=126336, tokenizer=None):
+def generate(
+    model,
+    prompt: torch.Tensor,
+    steps=128,
+    gen_length=128,
+    block_length=128,
+    temperature=0.,
+    cfg_scale=0.,
+    remasking='low_confidence',
+    mask_id=126336,
+    tokenizer=None
+):
     '''
     Args:
         model: Mask predictor.
@@ -61,9 +81,10 @@ def generate(model, prompt, steps=128, gen_length=128, block_length=128, tempera
     # 创建 shape = (1, prompt长度+gen_length) 的张量，全部初始化为 mask_id
     # 前半部分根据输入的 prompt 填充，后半部分为待生成区域（全是 mask）
     x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(model.device)
+    # 原先的tensor x使用了mask_id进行填充，将prompt部分进行替换
     x[:, :prompt.shape[1]] = prompt.clone()
 
-    # bool 张量，标记哪些 token 是 prompt 内容（不是 mask）
+    # bool 张量，标记哪些 token 是 prompt 内容（不是 mask_id）
     prompt_index = (x != mask_id)
 
     # 生成长度必须能被 block 长度整除（便于后续分块采样）
@@ -75,14 +96,18 @@ def generate(model, prompt, steps=128, gen_length=128, block_length=128, tempera
     # 计算每个 block 的扩散步数（细分步数）
     steps = steps // num_blocks
 
+    # 按block为单位进行生成，是semi-AR
     for num_block in range(num_blocks):
         # 把 x 当前 block 区域里哪些位置是 mask 标记出来（mask_index）
         block_mask_index = (x[:, prompt.shape[1] + num_block * block_length: prompt.shape[1] + (num_block + 1) * block_length:] == mask_id)
-        # 计算本 block 里每一步要去除多少个 mask（保证整个 block 匀速“扩散恢复”）
+        # 计算本 block 里每一步要去除多少个 mask
         num_transfer_tokens = get_num_transfer_tokens(block_mask_index, steps)
         # 遍历每个细分步
         for i in range(steps):
+            # 得到mask的index
             mask_index = (x == mask_id)
+
+            # 无分类器指导
             if cfg_scale > 0.:
                 un_x = x.clone()
                 un_x[prompt_index] = mask_id
@@ -123,6 +148,7 @@ def generate(model, prompt, steps=128, gen_length=128, block_length=128, tempera
 
             transfer_index = torch.zeros_like(x0, dtype=torch.bool, device=x0.device)
             for j in range(confidence.shape[0]):
+                # 根据置信度选择 topk 的 token
                 _, select_index = torch.topk(confidence[j], k=num_transfer_tokens[j, i])
                 transfer_index[j, select_index] = True
             x[transfer_index] = x0[transfer_index]

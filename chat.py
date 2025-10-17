@@ -21,11 +21,13 @@ def chat():
 
         m = [{"role": "user", "content": user_input}]
         user_input = tokenizer.apply_chat_template(m, add_generation_prompt=True, tokenize=False)
+        # 得到input_ids，转换为张量
         input_ids = tokenizer(user_input)['input_ids']
         input_ids = torch.tensor(input_ids).to(device).unsqueeze(0)
 
         if conversation_num == 0:
             prompt = input_ids
+        # 拼接原有的input_ids和新的input_ids，得到新的prompt
         else:
             prompt = torch.cat([prompt, input_ids[:, 1:]], dim=1)
 
